@@ -1,4 +1,6 @@
-resource "aws_s3_bucket" "terraform_state" {
+
+
+resource "aws_s3_bucket" "nanos-terraform-bucket" {
 
   bucket = "nanos-terraform-bucket"
 
@@ -29,4 +31,28 @@ resource "aws_dynamodb_table" "terraform_locks" {
     type = "S"
   }
 
+}
+
+
+terraform {
+  backend "s3" {
+    bucket = "nanos-terraform-bucket"
+    key = "terraform/terraform.tfstate"
+    region = "eu-west-1"
+
+    dynamodb_table = "terraform-up-and-running-locks"
+    encrypt = true
+
+    access_key =
+    secret_key =
+  }
+
+}
+
+output "s3_bucket-arn" {
+  value = aws_s3_bucket.nanos-terraform-bucket.arn
+}
+
+output "dynamodb_table_name" {
+  value = aws_dynamodb_table.terraform_locks.name
 }
